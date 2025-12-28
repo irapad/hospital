@@ -1,0 +1,12 @@
+# GitHub Token
+.github-token
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
