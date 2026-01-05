@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}แดชบอร์ด - Camera Security Management{% endblock %}
+
+{% block content %}
+<h2>แดชบอร์ดภาพรวม</h2>
+
+<div class="stats-grid">
+    <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="stat-number">{{ stats.total_cameras }}</div>
+        <div class="stat-label">กล้องทั้งหมด</div>
+    </div>
+
+    <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+        <div class="stat-number">{{ stats.vulnerable_cameras }}</div>
+        <div class="stat-label">กล้องที่มีช่องโหว่</div>
+    </div>
+
+    <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+        <div class="stat-number">{{ stats.secure_cameras }}</div>
+        <div class="stat-label">กล้องที่ปลอดภัย</div>
+    </div>
+
+    <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+        <div class="stat-number">{{ stats.unknown_cameras }}</div>
+        <div class="stat-label">ยังไม่ได้ตรวจสอบ</div>
+    </div>
+</div>
+
+<h3>การสแกนล่าสุด</h3>
+
+{% if stats.recent_scans %}
+<table>
+    <thead>
+        <tr>
+            <th>วันที่</th>
+            <th>ประเภท</th>
+            <th>กล้อง</th>
+            <th>ผลลัพธ์</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for scan in stats.recent_scans %}
+        <tr>
+            <td>{{ scan.scan_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td>{{ scan.scan_type }}</td>
+            <td>
+                <a href="{{ url_for('camera_detail', camera_id=scan.camera_id) }}">
+                    Camera #{{ scan.camera_id }}
+                </a>
+            </td>
+            <td>
+                {% if scan.success %}
+                    <span class="badge badge-success">สำเร็จ</span>
+                {% else %}
+                    <span class="badge badge-danger">ล้มเหลว</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>ยังไม่มีข้อมูลการสแกน</p>
+{% endif %}
+
+<div style="margin-top: 30px;">
+    <a href="{{ url_for('cameras') }}" class="btn">ดูกล้องทั้งหมด</a>
+    <a href="{{ url_for('add_camera') }}" class="btn btn-success">เพิ่มกล้องใหม่</a>
+    <a href="{{ url_for('scan') }}" class="btn">สแกนกล้องใหม่</a>
+</div>
+
+{% endblock %}

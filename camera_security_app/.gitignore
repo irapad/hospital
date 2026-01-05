@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+camera_security.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+hikscript.log
+
+# Temporary files
+/tmp/
+*.tmp
+/targets/
+/vulnerable/
+/snapshots/
+
+# Secrets
+.env
+config.py
+secrets.json
+
+# OS
+.DS_Store
+Thumbs.db

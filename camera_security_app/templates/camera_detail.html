@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}รายละเอียดกล้อง - {{ camera.ip_address }}{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>รายละเอียดกล้อง: {{ camera.ip_address }}</h2>
+    <div>
+        <button class="btn" onclick="checkCamera()">ตรวจสอบอีกครั้ง</button>
+        <form method="POST" action="{{ url_for('delete_camera', camera_id=camera.id) }}" style="display: inline;" onsubmit="return confirm('แน่ใจหรือว่าต้องการลบกล้องนี้?')">
+            <button type="submit" class="btn btn-danger">ลบกล้อง</button>
+        </form>
+    </div>
+</div>
+
+<div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 30px;">
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+        <div>
+            <strong>IP Address:</strong> {{ camera.ip_address }}<br>
+            <strong>Port:</strong> {{ camera.port }}<br>
+            <strong>Location:</strong> {{ camera.location or '-' }}<br>
+        </div>
+        <div>
+            <strong>สถานะ:</strong>
+            {% if camera.status == 'vulnerable' %}
+                <span class="badge badge-danger">มีช่องโหว่</span>
+            {% elif camera.status == 'secure' %}
+                <span class="badge badge-success">ปลอดภัย</span>
+            {% elif camera.status == 'checking' %}
+                <span class="badge badge-warning">กำลังตรวจสอบ...</span>
+            {% else %}
+                <span class="badge badge-secondary">ไม่ทราบ</span>
+            {% endif %}
+            <br>
+            <strong>ตรวจสอบล่าสุด:</strong>
+            {% if camera.last_checked %}
+                {{ camera.last_checked.strftime('%Y-%m-%d %H:%M:%S') }}
+            {% else %}
+                ไม่เคยตรวจสอบ
+            {% endif %}
+        </div>
+    </div>
+
+    {% if camera.notes %}
+    <div style="margin-top: 15px;">
+        <strong>หมายเหตุ:</strong><br>
+        {{ camera.notes }}
+    </div>
+    {% endif %}
+
+    {% if camera.credentials %}
+    <div style="margin-top: 15px; padding: 15px; background: #fff3cd; border-left: 4px solid #ffc107;">
+        <strong>⚠️ ข้อมูลการเข้าใช้งาน (Credentials):</strong><br>
+        <pre style="margin-top: 10px;">{{ camera.credentials }}</pre>
+    </div>
+    {% endif %}
+</div>
+
+<h3>ประวัติการสแกน</h3>
+
+{% if camera.scans %}
+<table>
+    <thead>
+        <tr>
+            <th>วันที่</th>
+            <th>ประเภท</th>
+            <th>ผลลัพธ์</th>
+            <th>รายละเอียด</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for scan in camera.scans|sort(attribute='scan_date', reverse=True) %}
+        <tr>
+            <td>{{ scan.scan_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td>{{ scan.scan_type }}</td>
+            <td>
+                {% if scan.success %}
+                    <span class="badge badge-success">สำเร็จ</span>
+                {% else %}
+                    <span class="badge badge-danger">ล้มเหลว</span>
+                {% endif %}
+            </td>
+            <td>
+                <button class="btn btn-sm" onclick="showDetails({{ scan.id }})">ดูรายละเอียด</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>ยังไม่มีประวัติการสแกน</p>
+{% endif %}
+
+<div style="margin-top: 30px;">
+    <a href="{{ url_for('cameras') }}" class="btn">← กลับไปรายการกล้อง</a>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function checkCamera() {
+    if (!confirm('ต้องการตรวจสอบกล้องนี้ใช่หรือไม่?')) {
+        return;
+    }
+
+    fetch(`/api/cameras/{{ camera.id }}/check`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        location.reload();
+    })
+    .catch(error => {
+        alert('เกิดข้อผิดพลาด: ' + error);
+    });
+}
+
+function showDetails(scanId) {
+    alert('รายละเอียดการสแกน ID: ' + scanId);
+    // TODO: Implement modal with scan details
+}
+</script>
+{% endblock %}

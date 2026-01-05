@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}กล้องทั้งหมด - Camera Security Management{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>กล้องทั้งหมด</h2>
+    <a href="{{ url_for('add_camera') }}" class="btn btn-success">+ เพิ่มกล้องใหม่</a>
+</div>
+
+{% if cameras %}
+<table>
+    <thead>
+        <tr>
+            <th>IP Address</th>
+            <th>Port</th>
+            <th>Location</th>
+            <th>สถานะ</th>
+            <th>ตรวจสอบล่าสุด</th>
+            <th>การดำเนินการ</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for camera in cameras %}
+        <tr>
+            <td>
+                <a href="{{ url_for('camera_detail', camera_id=camera.id) }}" style="color: #667eea; text-decoration: none;">
+                    {{ camera.ip_address }}
+                </a>
+            </td>
+            <td>{{ camera.port }}</td>
+            <td>{{ camera.location or '-' }}</td>
+            <td>
+                {% if camera.status == 'vulnerable' %}
+                    <span class="badge badge-danger">มีช่องโหว่</span>
+                {% elif camera.status == 'secure' %}
+                    <span class="badge badge-success">ปลอดภัย</span>
+                {% elif camera.status == 'checking' %}
+                    <span class="badge badge-warning">กำลังตรวจสอบ...</span>
+                {% else %}
+                    <span class="badge badge-secondary">ไม่ทราบ</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if camera.last_checked %}
+                    {{ camera.last_checked.strftime('%Y-%m-%d %H:%M') }}
+                {% else %}
+                    ไม่เคยตรวจสอบ
+                {% endif %}
+            </td>
+            <td>
+                <button class="btn btn-sm" onclick="checkCamera({{ camera.id }})">ตรวจสอบ</button>
+                <a href="{{ url_for('camera_detail', camera_id=camera.id) }}" class="btn btn-sm">รายละเอียด</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>ยังไม่มีกล้องในระบบ <a href="{{ url_for('add_camera') }}">เพิ่มกล้องใหม่</a></p>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function checkCamera(cameraId) {
+    if (!confirm('ต้องการตรวจสอบกล้องนี้ใช่หรือไม่?')) {
+        return;
+    }
+
+    fetch(`/api/cameras/${cameraId}/check`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        location.reload();
+    })
+    .catch(error => {
+        alert('เกิดข้อผิดพลาด: ' + error);
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}ตั้งค่า - Camera Security Management{% endblock %}
+
+{% block content %}
+<h2>ตั้งค่าระบบ</h2>
+
+<div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
+    <h3>เกี่ยวกับ HIKScript</h3>
+    <p>HIKScript เป็นเครื่องมือสำหรับตรวจสอบช่องโหว่ในกล้อง Hikvision</p>
+    <ul style="margin-left: 20px; margin-top: 10px;">
+        <li>สแกนหากล้อง Hikvision ผ่าน Shodan</li>
+        <li>ตรวจสอบช่องโหว่ Authentication Bypass (CVE-2017-7921)</li>
+        <li>ดึงข้อมูลการเข้าใช้งาน (Credentials) จากกล้องที่มีช่องโหว่</li>
+        <li>ทดสอบ RTSP Stream</li>
+        <li>จับภาพจากกล้อง</li>
+    </ul>
+</div>
+
+<div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
+    <h3>ข้อกำหนดของระบบ</h3>
+    <ul style="margin-left: 20px;">
+        <li>Python 3.8+</li>
+        <li>OpenSSL (สำหรับถอดรหัส credentials)</li>
+        <li>FFmpeg (ตัวเลือก, สำหรับทดสอบ RTSP)</li>
+    </ul>
+</div>
+
+<div style="background: #fff3cd; padding: 20px; border-radius: 5px; border-left: 4px solid #ffc107;">
+    <h3>⚠️ คำเตือนด้านกฎหมาย</h3>
+    <p>เครื่องมือนี้ควรใช้สำหรับ <strong>การทดสอบความปลอดภัยที่ได้รับอนุญาตเท่านั้น</strong></p>
+    <p>ผู้ใช้งานต้องรับผิดชอบในการปฏิบัติตามกฎหมายที่เกี่ยวข้อง</p>
+</div>
+
+<div style="margin-top: 30px;">
+    <h3>ข้อมูลระบบ</h3>
+    <table style="width: auto;">
+        <tr>
+            <td><strong>Version:</strong></td>
+            <td>1.0.0</td>
+        </tr>
+        <tr>
+            <td><strong>HIKScript Version:</strong></td>
+            <td>2.1</td>
+        </tr>
+        <tr>
+            <td><strong>Database:</strong></td>
+            <td>SQLite</td>
+        </tr>
+        <tr>
+            <td><strong>Framework:</strong></td>
+            <td>Flask + SQLAlchemy</td>
+        </tr>
+    </table>
+</div>
+
+<div style="margin-top: 30px;">
+    <h3>ลิงก์ที่เป็นประโยชน์</h3>
+    <ul style="margin-left: 20px;">
+        <li><a href="https://github.com/fracergu/HIKScript" target="_blank">HIKScript GitHub Repository</a></li>
+        <li><a href="https://shodan.io" target="_blank">Shodan - Search Engine for Internet-connected Devices</a></li>
+        <li><a href="https://nvd.nist.gov/vuln/detail/CVE-2017-7921" target="_blank">CVE-2017-7921 - Hikvision Vulnerability</a></li>
+    </ul>
+</div>
+
+{% endblock %}

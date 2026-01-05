@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}สแกนกล้อง - Camera Security Management{% endblock %}
+
+{% block content %}
+<h2>สแกนหากล้อง Hikvision</h2>
+
+<div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
+    <strong>⚠️ คำเตือน:</strong> การสแกนหากล้องผ่าน Shodan ต้องมี API Key และควรทำเฉพาะในกรณีที่ได้รับอนุญาตเท่านั้น
+</div>
+
+<div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 30px;">
+    <h3>สแกนผ่าน Shodan</h3>
+    <form id="shodanScanForm">
+        <div class="form-group">
+            <label for="api_key">Shodan API Key *</label>
+            <input type="text" id="api_key" name="api_key" required placeholder="ใส่ Shodan API Key">
+            <small style="color: #666;">รับ API Key ฟรีได้ที่ <a href="https://shodan.io" target="_blank">shodan.io</a></small>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+            <div class="form-group">
+                <label for="city">เมือง (ตัวเลือก)</label>
+                <input type="text" id="city" name="city" placeholder="เช่น Bangkok">
+            </div>
+
+            <div class="form-group">
+                <label for="country">รหัสประเทศ (ตัวเลือก)</label>
+                <input type="text" id="country" name="country" placeholder="เช่น TH" maxlength="2">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="limit">จำนวนผลลัพธ์สูงสุด</label>
+            <input type="number" id="limit" name="limit" value="100" min="1" max="1000">
+        </div>
+
+        <button type="submit" class="btn btn-success">เริ่มสแกน</button>
+    </form>
+</div>
+
+<h3>ประวัติการสแกน</h3>
+
+{% if scans %}
+<table>
+    <thead>
+        <tr>
+            <th>วันที่</th>
+            <th>Query</th>
+            <th>ตำแหน่ง</th>
+            <th>จำนวนผลลัพธ์</th>
+            <th>ไฟล์</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for scan in scans %}
+        <tr>
+            <td>{{ scan.scan_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td><code>{{ scan.query }}</code></td>
+            <td>{{ scan.location_filter }}</td>
+            <td>{{ scan.results_count }}</td>
+            <td>
+                {% if scan.results_file %}
+                    <code style="font-size: 11px;">{{ scan.results_file }}</code>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>ยังไม่มีประวัติการสแกน</p>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('shodanScanForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const formData = {
+        api_key: document.getElementById('api_key').value,
+        city: document.getElementById('city').value,
+        country: document.getElementById('country').value,
+        limit: parseInt(document.getElementById('limit').value)
+    };
+
+    if (!confirm('ต้องการเริ่มสแกนหากล้อง Hikvision ใช่หรือไม่?\n\nการสแกนอาจใช้เวลาสักครู่')) {
+        return;
+    }
+
+    fetch('/api/scan/shodan', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('เกิดข้อผิดพลาด: ' + data.error);
+        } else {
+            alert('เริ่มสแกนแล้ว! ผลลัพธ์จะแสดงในไม่ช้า');
+            setTimeout(() => location.reload(), 5000);
+        }
+    })
+    .catch(error => {
+        alert('เกิดข้อผิดพลาด: ' + error);
+    });
+});
+</script>
+{% endblock %}
