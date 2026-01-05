@@ -13,8 +13,8 @@ import json
 import threading
 from pathlib import Path
 
-# Add hikscript-lib to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'hikscript-lib'))
+# Add hikscript-lib to path (not needed in production - library is self-contained)
+# sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'hikscript-lib'))
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
