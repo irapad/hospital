@@ -10,3 +10,6 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# External libraries (cloned repositories)
+hikscript-lib/
